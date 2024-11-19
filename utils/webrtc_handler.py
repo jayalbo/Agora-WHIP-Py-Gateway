@@ -22,7 +22,7 @@ async def handle_webrtc_connection(sdp_offer, resource_id, channel_id, uid):
     """
 
     agora_service = initialize_agora_service()
-    connection, video_sender, audio_sender, video_track = await setup_agora_connection(agora_service, channel_id, uid)
+    connection, video_sender, audio_sender, video_track = await setup_agora_connection(agora_service, channel_id, uid, resource_id)
     pc = setup_peer_connection()
 
     @pc.on("track")
@@ -75,11 +75,16 @@ async def finalize_sdp_exchange(pc, sdp_offer):
 
     return pc.localDescription
 
-async def cleanup_connection(pc, resource_id):
+async def cleanup_connection(resource_id):
     """
     Cleans up resources for the specified connection.
     """
+    pc = peer_connections.get(resource_id)
+    await pc.close()
+    print(peer_connections)
+    print(f"Cleaning up connection {pc}")
     if resource_id in peer_connections:
         del peer_connections[resource_id]
-    await pc.close()
+
     print(f"Cleaned up connection {resource_id}")
+    return True

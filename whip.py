@@ -7,6 +7,8 @@ from quart import Quart, jsonify, request, abort, make_response
 from dotenv import load_dotenv
 from functools import wraps
 from utils.whip_handler import whip_handler
+from utils.webrtc_handler import cleanup_connection
+from utils.agora_service import cleanup_agora_connection
 from storage import stream_keys
 from auth import require_auth
 from config import APP_ID, CERTIFICATE, CUSTOMER_ID, CUSTOMER_SECRET
@@ -85,6 +87,12 @@ async def delete_stream_key(stream_key):
 @app.route('/whip', methods=['POST'])
 async def whip():
     return await whip_handler()
+
+@app.route('/whip/resource/<resource_id>', methods=['DELETE'])
+async def delete_resource(resource_id):
+    await cleanup_agora_connection(resource_id)
+    await cleanup_connection(resource_id)
+    return jsonify({"message": "Resource deleted"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

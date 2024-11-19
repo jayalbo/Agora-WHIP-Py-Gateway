@@ -1,7 +1,9 @@
 import os
-from config import APP_ID
+from config import APP_ID, CERTIFICATE
+from libs.token_generator.RtcTokenBuilder2 import RtcTokenBuilder
 from agora.rtc.agora_service import AgoraService, RTCConnection, VideoEncoderConfiguration, VideoDimensions, AgoraServiceConfig
 from agora.rtc.agora_base import ClientRoleType, RTCConnConfig, ChannelProfileType, AudioScenarioType
+from storage import agora_peer_connections
 
 LOG_DIR = os.path.join(os.getcwd(), "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -12,14 +14,13 @@ def initialize_agora_service():
     """
     agora_service = AgoraService()
     config = AgoraServiceConfig(appid=APP_ID, enable_video=1)
-
     agora_service.initialize(config)
 
 
     agora_service.set_log_file(os.path.join(LOG_DIR, "agorasdk.log"))
     print(f"Agora logs will be saved to {LOG_DIR}")
     return agora_service
-def set_video_encoder_configuration(video_track, width, height, frame_rate = 10):
+def set_video_encoder_configuration(video_track, width, height, frame_rate = 30):
     """
     Sets the video encoder configuration for the video track.
     """
@@ -29,7 +30,7 @@ def set_video_encoder_configuration(video_track, width, height, frame_rate = 10)
         encode_alpha=0
     )
     video_track.set_video_encoder_configuration(video_config)
-async def setup_agora_connection(agora_service, channel_id, uid):
+async def setup_agora_connection(agora_service, channel_id, uid, resource_id):
     """
     Sets up the Agora connection and returns the connection object and video track.
     """
@@ -41,10 +42,17 @@ async def setup_agora_connection(agora_service, channel_id, uid):
     if not connection:
         raise Exception("Failed to create Agora connection")
 
-    ret = connection.connect("", channel_id, str(uid))
+    # Check if Certificate is set
+    if CERTIFICATE:
+        token = RtcTokenBuilder.build_token_with_uid(APP_ID, CERTIFICATE, channel_id, str(uid), 86400, 0)
+    else:
+        token = ""
+    print(token)
+    ret = connection.connect(token, channel_id, str(uid))
     if ret < 0:
         raise Exception(f"Failed to connect to Agora: {ret}")
     print("Connected to Agora successfully")
+    agora_peer_connections[resource_id] = connection
 
     media_node_factory = agora_service.create_media_node_factory()
 
@@ -70,5 +78,15 @@ async def setup_agora_connection(agora_service, channel_id, uid):
     local_user.publish_video(video_track)
     local_user.publish_audio(audio_track)
     print("Published video to Agora successfully")
-
     return connection, video_sender, audio_sender, video_track
+
+async def cleanup_agora_connection(resource_id):
+    """
+    Cleans up the Agora connection and resources.
+    """
+    connection = agora_peer_connections.get(resource_id)
+    if connection:
+        connection.disconnect()
+        connection.release()
+        agora_peer_connections.pop(resource_id)
+    print("Disconnected from Agora")

@@ -10,7 +10,7 @@ import secrets
 from hashlib import sha256
 from collections import OrderedDict
 
-from Packer import *
+from .Packer import *
 
 VERSION_LENGTH = 3
 
