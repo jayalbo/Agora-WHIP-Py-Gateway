@@ -1,4 +1,4 @@
 Quart==0.17.0
 python-dotenv==0.20.0
 aiortc==1.9.0
-agora_python_server_sdk=2.1.0
+agora_python_server_sdk==2.1.0
