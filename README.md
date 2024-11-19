@@ -95,3 +95,9 @@ Endpoint for WebRTC WHIP logic.
 Endpoint for WebRTC / Agora WHIP termination logic.
 
 ---
+
+# To do
+
+- [x] ~~Add Agora token support~~
+- [ ] Enable encoded video frames processing
+- [ ] Enable video transcoding
