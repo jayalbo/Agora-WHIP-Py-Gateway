@@ -1,4 +1,4 @@
-# Agora WHIP Python Server Gateway Gateway
+# Agora WHIP Python Server Gateway
 
 **Agora WHIP Python Server Gateway** allows users to publish WebRTC streams to Agora’s streaming platform using the WHIP (WebRTC-HTTP Ingestion Protocol), enabling seamless integration for live video and audio workflows.
 
