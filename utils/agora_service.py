@@ -44,10 +44,10 @@ async def setup_agora_connection(agora_service, channel_id, uid, resource_id):
 
     # Check if Certificate is set
     if CERTIFICATE:
-        token = RtcTokenBuilder.build_token_with_uid(APP_ID, CERTIFICATE, channel_id, str(uid), 86400, 0)
+        token = RtcTokenBuilder.build_token_with_uid(APP_ID, CERTIFICATE, channel_id, str(uid),1, 86400, 0)
     else:
         token = ""
-    print(token)
+
     ret = connection.connect(token, channel_id, str(uid))
     if ret < 0:
         raise Exception(f"Failed to connect to Agora: {ret}")

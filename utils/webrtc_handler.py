@@ -20,7 +20,7 @@ async def handle_webrtc_connection(sdp_offer, resource_id, channel_id, uid):
     """
     Orchestrates Agora and WebRTC setup for the /whip endpoint.
     """
-
+    print(f"New WebRTC connection for resource {resource_id}")
     agora_service = initialize_agora_service()
     connection, video_sender, audio_sender, video_track = await setup_agora_connection(agora_service, channel_id, uid, resource_id)
     pc = setup_peer_connection()
@@ -53,7 +53,6 @@ async def handle_webrtc_connection(sdp_offer, resource_id, channel_id, uid):
                 except Exception as e:
                     print(f"Error processing audio track: {e}")
                     break
-
 
     sdp_answer = await finalize_sdp_exchange(pc, sdp_offer)
     peer_connections[resource_id] = pc
