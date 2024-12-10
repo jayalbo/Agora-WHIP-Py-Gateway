@@ -27,7 +27,7 @@ async def handle_webrtc_connection(sdp_offer, resource_id, channel_id, uid):
 
     @pc.on("track")
     async def on_track(track):
-        video_first_frame = True;
+        video_first_frame = True
         if track.kind == "video":
             while True:
                 try:
